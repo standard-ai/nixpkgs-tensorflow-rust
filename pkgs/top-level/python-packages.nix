@@ -2499,6 +2499,8 @@ in {
 
   iniparse = callPackage ../development/python-modules/iniparse { };
 
+  intreehooks = callPackage ../development/python-modules/intreehooks { };
+
   i3-py = callPackage ../development/python-modules/i3-py { };
 
   JayDeBeApi = callPackage ../development/python-modules/JayDeBeApi {};
