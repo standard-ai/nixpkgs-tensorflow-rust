@@ -10,7 +10,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: cachix/install-nix-action@v3
-    - run: nix-build -A buildRustCrateTests
-    - run: nix-build -A python36.pkgs.tensorflow
+    - uses: cachix/cachix-action@v3
+      with:
+        name: ai-nixpkgs
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+        attributes: buildRustCrateTests
+    - uses: cachix/cachix-action@v3
+      with:
+        name: ai-nixpkgs
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+        attributes: python36.pkgs.tensorflow
     - run: >
         nix-shell -I nixpkgs=. -E 'with import <nixpkgs> {}; (python3.withPackages (p: [p.tensorflow])).env' --run "python -c 'from tensorflow.contrib import tensor_forest'"
