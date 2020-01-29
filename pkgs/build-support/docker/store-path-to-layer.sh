@@ -5,11 +5,8 @@ set -eu
 layerNumber=$1
 shift
 
-storePath="$1"
-shift
-
 layerPath="./layers/$layerNumber"
-echo "Creating layer #$layerNumber for $storePath"
+echo "Creating layer #$layerNumber for $@"
 
 mkdir -p "$layerPath"
 
@@ -34,14 +31,16 @@ tar -cf "$layerPath/layer.tar"  \
 # the relative nix store path, tar will ignore changes
 # to /nix/store. In order to create the correct structure
 # in the tar file, we transform the relative nix store
-# path to the absolute store path
-n=$(basename "$storePath")
-tar -C /nix/store -rpf "$layerPath/layer.tar" \
-    --hard-dereference --sort=name \
-    --mtime="@$SOURCE_DATE_EPOCH" \
-    --owner=0 --group=0 \
-    --transform="s,$n,/nix/store/$n," \
-    $n
+# path to the absolute store path.
+for storePath in "$@"; do
+  n=$(basename "$storePath")
+  tar -C /nix/store -rpf "$layerPath/layer.tar" \
+      --hard-dereference --sort=name \
+      --mtime="@$SOURCE_DATE_EPOCH" \
+      --owner=0 --group=0 \
+      --transform="s,$n,/nix/store/$n," \
+      $n
+done
 
 # Compute a checksum of the tarball.
 tarhash=$(tarsum < $layerPath/layer.tar)

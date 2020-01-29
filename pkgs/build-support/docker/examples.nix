@@ -234,4 +234,13 @@ rec {
     contents = [ pkgs.hello ];
   };
 
+  # 15. Create a layered image with only 2 layers
+  two-layered-image = pkgs.dockerTools.buildLayeredImage {
+    name = "two-layered-image";
+    tag = "latest";
+    config.Cmd = [ "${pkgs.hello}/bin/hello" ];
+    contents = [ pkgs.bash pkgs.hello ];
+    maxLayers = 2;
+  };
+
 }
